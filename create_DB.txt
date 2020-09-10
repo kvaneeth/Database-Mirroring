@@ -1,0 +1,10 @@
+
+export PGPASSWORD='********'
+#psql -h 127.0.0.1 -p 50025 -U postgres -d postgres  -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'fanup_bak' AND pid <> pg_backend_pid();"
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres  -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'fanup_app' AND pid <> pg_backend_pid();"
+#psql -h 127.0.0.1 -p 50025 -U postgres -d postgres -c "Drop DATABASE fanup_archival;"
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -c "CREATE DATABASE fanup_archival WITH TEMPLATE fanup_app;"
+#psql -h 127.0.0.1 -p 50025 -U postgres -d postgres -c "\c fanup_dev;"
+#psql -h  127.0.0.1 -p 50025 -U postgries -d fanup_dev  -c "SELECT count(*) FROM public.\"Users\"; SELECT count(*) FROM public.\"Users\";"
+#psql -h 127.0.0.1 -p 50025 -U postgres -d fanup_dev  -c "SELECT * from public.insertrecords_followers();"
+#psql -h 127.0.0.1 -p 50025 -U postgres -d postgres -c "pg_dump -t public.\"Bets_Bak\" fanup_bak | psql fanup_archival;"
