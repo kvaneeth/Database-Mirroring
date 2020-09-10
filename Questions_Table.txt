@@ -1,0 +1,50 @@
+-- FUNCTION: public.insertrecords_questions()
+
+-- DROP FUNCTION public.insertrecords_questions();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_questions(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."Questions_bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanup_app user=postgres password=test123456',
+   'select * from Public."Questions" WHERE "Questions"."createdAt" BETWEEN NOW() - INTERVAL ''14 Days'' AND NOW()'
+  ) as t1(
+    id integer ,
+    question_type integer,
+    question_category integer,
+    question_belongs_to character varying(255),
+    match_id integer,
+    player_id integer,
+    team_id integer,
+    event_id integer,
+    league_id integer,
+    league_question_type character varying(255) ,
+    question text ,
+    options json,
+    answer integer,
+    is_popular boolean,
+    status integer,
+    "createdAt" timestamp with time zone ,
+    "updatedAt" timestamp with time zone 
+	   )
+ );
+ INSERT INTO Public."Questions" SELECT * FROM public."Questions_bak" ;
+ select count(*) into total FROM public."Questions_bak";   
+ Drop table public."Questions_bak" ;
+ RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_questions()
+    OWNER TO fanup;
