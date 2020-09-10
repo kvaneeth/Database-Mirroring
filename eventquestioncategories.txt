@@ -1,0 +1,39 @@
+-- FUNCTION: public.insertrecords_eventquestioncategories()
+
+-- DROP FUNCTION public.insertrecords_eventquestioncategories();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_eventquestioncategories(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."EventQuestionCategories_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."EventQuestionCategories" WHERE "EventQuestionCategories"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+  id integer ,
+    name character varying(255) ,
+    color character varying(255) ,
+    status integer,
+    "createdAt" timestamp with time zone ,
+    "updatedAt" timestamp with time zone 
+       )
+ );
+ INSERT INTO Public."EventQuestionCategories" SELECT * FROM public."EventQuestionCategories_Bak" ;
+ select count(*) into total FROM public."EventQuestionCategories_Bak";   
+ Drop table public."EventQuestionCategories_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_eventquestioncategories()
+    OWNER TO postgres;

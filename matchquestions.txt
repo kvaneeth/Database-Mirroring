@@ -1,0 +1,55 @@
+-- FUNCTION: public.insertrecords_matchquestions()
+
+-- DROP FUNCTION public.insertrecords_matchquestions();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_matchquestions(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."MatchQuestions_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."MatchQuestions" WHERE "MatchQuestions"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+     id integer,
+    match_id integer,
+    type integer,
+    question character varying(255),
+    player1 character varying(255) ,
+    player2 character varying(255) ,
+    team1 character varying(255) ,
+    team2 character varying(255) ,
+    answer integer,
+    odds1 double precision,
+    odds2 double precision,
+    display_odds1 character varying(255) ,
+    display_odds2 character varying(255) ,
+    label1 character varying(255) ,
+    label2 character varying(255) ,
+    player_img1 character varying(255) ,
+    player_img2 character varying(255) ,
+    team_img1 character varying(255) ,
+    team_img2 character varying(255) ,
+    status integer,
+    "createdAt" timestamp with time zone ,
+    "updatedAt" timestamp with time zone 
+       )
+ );
+ INSERT INTO Public."MatchQuestions" SELECT * FROM public."MatchQuestions_Bak" ;
+ select count(*) into total FROM public."MatchQuestions_Bak";   
+ Drop table public."MatchQuestions_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_matchquestions()
+    OWNER TO postgres;

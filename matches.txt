@@ -1,0 +1,57 @@
+-- FUNCTION: public.insertrecords_matches()
+
+-- DROP FUNCTION public.insertrecords_matches();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_matches(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."Matches_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+   'select * from Public."Matches" WHERE "Matches"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer,
+    league_id integer,
+    league_tp_id character varying(255) ,
+    season_id character varying(255) ,
+    week_id character varying(255) ,
+    match_id character varying(255) ,
+    reference character varying(255) ,
+    sr_id character varying(255) ,
+    swish_id integer,
+    ps_id integer,
+    home_team_name character varying(255) ,
+    home_team_id character varying(255) ,
+    home_team_alias character varying(255) ,
+    away_team_name character varying(255) ,
+    away_team_id character varying(255) ,
+    away_team_alias character varying(255) ,
+    match_status character varying(255) ,
+    scheduled character varying(255) ,
+    scheduled_datetime timestamp with time zone,
+    scheduled_date date,
+    scheduled_time time without time zone,
+    status integer,
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone 
+  )
+ );
+ INSERT INTO Public."Matches" SELECT * FROM public."Matches_Bak" ;
+ select count(*) into total FROM public."Matches_Bak";   
+ Drop table public."Matches_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_matches()
+    OWNER TO postgres;

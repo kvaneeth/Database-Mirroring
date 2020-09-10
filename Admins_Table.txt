@@ -1,0 +1,53 @@
+-- FUNCTION: public.insertrecords_admins()
+
+-- DROP FUNCTION public.insertrecords_admins();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_admins(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."Admins_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."Admins" WHERE "Admins"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+   id integer,
+    role integer,
+    "fullName" character varying(255),
+    email character varying(255),
+    "userName" character varying(255),
+    password character varying(255),
+    mobile character varying(255),
+    country_code character varying(255),
+    latitude character varying(255),
+    longitude character varying(255),
+    address character varying(255),
+    activation_key character varying(255),
+    otp character varying(255) ,
+    email_verification integer,
+    mobile_verification integer,
+    notifications integer,
+    img character varying(255),
+    status integer,
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone
+  	  )
+ ) ;
+ INSERT INTO Public."Admins" SELECT * FROM public."Admins_Bak" ;
+ select count(*) into total FROM public."Admins_Bak";   
+ Drop table public."Admins_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_admins()
+    OWNER TO postgres;

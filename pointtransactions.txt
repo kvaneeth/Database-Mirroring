@@ -1,0 +1,44 @@
+-- FUNCTION: public.insertrecords_pointtransactions()
+
+-- DROP FUNCTION public.insertrecords_pointtransactions();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_pointtransactions(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."PointTransactions_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."PointTransactions" WHERE "PointTransactions"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer,
+    user_id integer,
+    bet_id integer,
+    bet_type character varying(255),
+    group_id integer,
+    bet_group_id character varying(255),
+    particular character varying(255),
+    points double precision,
+    type character varying(255),
+    status integer,
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone       )
+ );
+ INSERT INTO Public."PointTransactions" SELECT * FROM public."PointTransactions_Bak" ;
+ select count(*) into total FROM public."PointTransactions_Bak";   
+ Drop table public."PointTransactions_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_pointtransactions()
+    OWNER TO postgres;

@@ -1,0 +1,38 @@
+-- FUNCTION: public.insertrecords_series_teams()
+
+-- DROP FUNCTION public.insertrecords_series_teams();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_series_teams(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."series_teams_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."series_teams" WHERE "series_teams"."created_at" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer ,
+    serie_id integer,
+    team_id integer,
+    created_at timestamp with time zone ,
+    updated_at timestamp with time zone 
+	  )
+ ) ;
+ INSERT INTO Public."series_teams" SELECT * FROM public."series_teams_Bak" ;
+ select count(*) into total FROM public."series_teams_Bak";   
+ Drop table public."series_teams_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_series_teams()
+    OWNER TO postgres;

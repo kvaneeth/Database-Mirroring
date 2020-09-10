@@ -1,0 +1,61 @@
+-- FUNCTION: public.insertrecords_lol_champions()
+
+-- DROP FUNCTION public.insertrecords_lol_champions();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_lol_champions(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."lol_champions_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."lol_champions" WHERE "lol_champions"."created_at" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer ,
+    champion_id integer,
+    armor integer,
+    armorperlevel integer,
+    attackdamage integer,
+    attackdamageperlevel integer,
+    attackrange integer,
+    attackspeedoffset integer,
+    attackspeedperlevel double precision,
+    big_image_url character varying(255) ,
+    crit integer,
+    critperlevel integer,
+    hp integer,
+    hpperlevel integer,
+    hpregen integer,
+    hpregenperlevel double precision,
+    image_url character varying(255),
+    movespeed integer,
+    mp integer,
+    mpperlevel integer,
+    mpregen integer,
+    mpregenperlevel integer,
+    name character varying(255),
+    spellblock integer,
+    spellblockperlevel double precision,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone
+   
+	  )
+ ) ;
+ INSERT INTO Public."lol_champions" SELECT * FROM public."lol_champions_Bak" ;
+ select count(*) into total FROM public."lol_champions_Bak";   
+ Drop table public."lol_champions_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_lol_champions()
+    OWNER TO postgres;

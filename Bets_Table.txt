@@ -1,0 +1,90 @@
+-- FUNCTION: public.insertrecords_bets()
+
+-- DROP FUNCTION public.insertrecords_bets();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_bets(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."Bets_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+   'select * from Public."Bets" WHERE "Bets"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer ,
+    user_id integer,
+    league_id integer,
+    home_team_db_id integer,
+    away_team_db_id integer,
+    match_db_id integer,
+    match_id character varying(255),
+    sr_id character varying(255),
+    bet_type integer,
+    group_id integer,
+    bet_group_id character varying(255),
+    play_type character varying(255),
+    is_challenge integer,
+    challenger_user_id integer,
+    is_challenge_accept integer,
+    is_group_challenge integer,
+    challenger_group_id integer,
+    is_group_challenge_accept integer,
+    sp_bet_type integer,
+    sp_bet_on character varying(255),
+    sp_spread double precision,
+    sp_odds double precision,
+    sp_bet_points integer,
+    sp_win_points double precision,
+    sp_challenge_win_points double precision,
+    money_bet_type integer,
+    money_bet_on character varying(255),
+    money_odds double precision,
+    money_bet_points integer,
+    money_win_points double precision,
+    money_challenge_win_points double precision,
+    over_under_bet_type integer,
+    over_under_bet_on character varying(255),
+    over_under_total double precision,
+    over_under_odds double precision,
+    over_under_bet_points integer,
+    over_under_win_points double precision,
+    over_under_challenge_win_points double precision,
+    question_bet_type integer,
+    match_question_bet_on integer,
+    match_question_type integer,
+    match_question_id integer,
+    question_bet_points double precision,
+    question_win_points double precision,
+    question_challenge_win_points double precision,
+    event_question_bet_type integer,
+    event_id integer,
+    event_question_id integer,
+    event_option integer,
+    event_question_bet_points integer,
+    event_question_win_points double precision,
+    event_question_challenge_win_points double precision,
+    single_bet_status character varying(255),
+    group_bet_status character varying(255),
+    final_bet_status character varying(255),
+    status integer,
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone 	    )
+ );
+ INSERT INTO Public."Bets" SELECT * FROM public."Bets_Bak" ;
+ select count(*) into total FROM public."Bets_Bak";   
+ Drop table public."Bets_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_bets()
+    OWNER TO postgres;

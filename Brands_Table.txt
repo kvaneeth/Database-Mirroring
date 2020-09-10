@@ -1,0 +1,39 @@
+-- FUNCTION: public.insertrecords_brands()
+
+-- DROP FUNCTION public.insertrecords_brands();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_brands(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."Brands_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+   'select * from Public."Brands" WHERE "Brands"."createdAt" BETWEEN NOW() - INTERVAL ''1 weeks'' AND NOW()'  
+  ) as t1(
+    id integer,
+   brand_name character varying(255),
+     img character varying(255),
+	  status integer,
+	  "createdAt" timestamp with time zone,
+	  "updatedAt" timestamp with time zone
+  )
+ );
+ INSERT INTO Public."Brands" SELECT * FROM public."Brands_Bak" ;
+ select count(*) into total FROM public."Brands_Bak";   
+ Drop table public."Brands_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_brands()
+    OWNER TO postgres;

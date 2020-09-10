@@ -1,0 +1,40 @@
+-- FUNCTION: public.insertrecords_leaguelabels()
+
+-- DROP FUNCTION public.insertrecords_leaguelabels();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_leaguelabels(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."LeagueLabels_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."LeagueLabels" WHERE "LeagueLabels"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer,
+    league_id integer,
+    lable character varying(255),
+    type character varying(255),
+    status integer,
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone
+       )
+ );
+ INSERT INTO Public."LeagueLabels" SELECT * FROM public."LeagueLabels_Bak" ;
+ select count(*) into total FROM public."LeagueLabels_Bak";   
+ Drop table public."LeagueLabels_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_leaguelabels()
+    OWNER TO postgres;

@@ -1,0 +1,43 @@
+-- FUNCTION: public.insertrecords_lol_frame_teams()
+
+-- DROP FUNCTION public.insertrecords_lol_frame_teams();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_lol_frame_teams(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."lol_frame_teams_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."lol_frame_teams" WHERE "lol_frame_teams"."created_at" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+      id integer ,
+    team_id integer,
+    drakes integer,
+    gold integer,
+    kills integer,
+    nashors integer,
+    score integer,
+    towers integer,
+    created_at timestamp with time zone ,
+    updated_at timestamp with time zone 
+  	  )
+ ) ;
+ INSERT INTO Public."lol_frame_teams" SELECT * FROM public."lol_frame_teams_Bak" ;
+ select count(*) into total FROM public."lol_frame_teams_Bak";   
+ Drop table public."lol_frame_teams_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_lol_frame_teams()
+    OWNER TO postgres;

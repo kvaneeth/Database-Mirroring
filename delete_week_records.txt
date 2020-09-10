@@ -1,0 +1,55 @@
+-- FUNCTION: public.totalrecords()
+
+-- DROP FUNCTION public.totalrecords();
+
+CREATE OR REPLACE FUNCTION public.totalrecords(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ select count(*) into total FROM public."Users";
+ Delete from Public."Admins" WHERE "Admins"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Bets" WHERE "Bets"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ --Delete from Public."Brands" WHERE "Brands"."createdAt" NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."ContactInvitations" WHERE "ContactInvitations"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."EventQuestionCategories" WHERE "EventQuestionCategories"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."EventQuestions" WHERE "EventQuestions"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Events" WHERE "Events"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."FavoriteBrands" WHERE "FavoriteBrands"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."FavoriteLeagues" WHERE "FavoriteLeagues"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."FavoritePlayers" WHERE "FavoritePlayers"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."FavoriteTeams" WHERE "FavoriteTeams"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."FeedComments" WHERE "FeedComments"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."FeedLikes" WHERE "FeedLikes"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."FeedSliders" WHERE "FeedSliders"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Followers" WHERE "Followers"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."GroupUsers" WHERE "GroupUsers"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Groups" WHERE "Groups"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."LeagueLabels" WHERE "LeagueLabels"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Leagues" WHERE "Leagues"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."LocationLeagues" WHERE "LocationLeagues"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."LocationPlayers" WHERE "LocationPlayers"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."LocationTeams" WHERE "LocationTeams"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Locations" WHERE "Locations"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."MatchOdds" WHERE "MatchOdds"."createdAt"  NOT BETWEEN  NOW() - INTERVAL '1 Weeks' AND NOW();
+ Delete from Public."MatchQuestions" WHERE "MatchQuestions"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Matches" WHERE "Matches"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Notifications" WHERE "Notifications"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Players" WHERE "Players"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."PointTransactions" WHERE "PointTransactions"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Teams" WHERE "Teams"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ Delete from Public."Users" WHERE "Users"."createdAt"  NOT BETWEEN NOW() - INTERVAL '1 weeks' AND NOW();
+ 
+RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.totalrecords()
+    OWNER TO postgres;

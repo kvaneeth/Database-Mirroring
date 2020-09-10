@@ -1,0 +1,40 @@
+-- FUNCTION: public.insertrecords_groups()
+
+-- DROP FUNCTION public.insertrecords_groups();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_groups(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."Groups_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+   'select * from Public."Groups" WHERE "Groups"."createdAt" BETWEEN NOW() - INTERVAL ''1 weeks'' AND NOW()'
+  ) as t1(
+    id integer,
+	user_id integer,
+	name character varying(255),
+	img character varying(255),
+	status integer,
+	"createdAt" timestamp with time zone,
+	"updatedAt" timestamp with time zone
+       )
+ );
+ INSERT INTO Public."Groups" SELECT * FROM public."Groups_Bak" ;
+ select count(*) into total FROM public."Groups_Bak";   
+ Drop table public."Groups_Bak" ;
+ RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_groups()
+    OWNER TO postgres;

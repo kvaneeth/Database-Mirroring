@@ -1,0 +1,39 @@
+-- FUNCTION: public.insertrecords_es_matches_opponents()
+
+-- DROP FUNCTION public.insertrecords_es_matches_opponents();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_es_matches_opponents(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."es_matches_opponents_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."es_matches_opponents" WHERE "es_matches_opponents"."created_at" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+   id integer ,
+    es_match_id integer,
+    opponent_type character varying(255) ,
+    opponent_id integer,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone
+	  )
+ ) ;
+ INSERT INTO Public."es_matches_opponents" SELECT * FROM public."es_matches_opponents_Bak" ;
+ select count(*) into total FROM public."es_matches_opponents_Bak";   
+ Drop table public."es_matches_opponents_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_es_matches_opponents()
+    OWNER TO postgres;

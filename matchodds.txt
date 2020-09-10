@@ -1,0 +1,47 @@
+-- FUNCTION: public.insertrecords_matchodds()
+
+-- DROP FUNCTION public.insertrecords_matchodds();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_matchodds(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."MatchOdds_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."MatchOdds" WHERE "MatchOdds"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer,
+    match_id_db integer,
+    match_id character varying(255),
+    moneyline_home double precision,
+    moneyline_away double precision,
+    spread double precision,
+    spread_home double precision,
+    spread_away double precision,
+    total double precision,
+    total_over double precision,
+    total_under double precision,
+    status integer,
+    "createdAt" timestamp with time zone ,
+    "updatedAt" timestamp with time zone 
+       )
+ );
+ INSERT INTO Public."MatchOdds" SELECT * FROM public."MatchOdds_Bak" ;
+ select count(*) into total FROM public."MatchOdds_Bak";   
+ Drop table public."MatchOdds_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_matchodds()
+    OWNER TO postgres;

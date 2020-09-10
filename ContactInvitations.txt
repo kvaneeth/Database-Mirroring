@@ -1,0 +1,39 @@
+-- FUNCTION: public.insertrecords_contactinvitations()
+
+-- DROP FUNCTION public.insertrecords_contactinvitations();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_contactinvitations(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."ContactInvitations_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."ContactInvitations" WHERE "ContactInvitations"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+  id integer,
+    user_id integer,
+    mobile character varying(255),
+    status integer,
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone
+  	  )
+ ) ;
+ INSERT INTO Public."ContactInvitations" SELECT * FROM public."ContactInvitations_Bak" ;
+ select count(*) into total FROM public."ContactInvitations_Bak";   
+ Drop table public."ContactInvitations_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_contactinvitations()
+    OWNER TO postgres;

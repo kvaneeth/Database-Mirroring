@@ -1,0 +1,45 @@
+-- FUNCTION: public.insertrecords_marketfixtures()
+
+-- DROP FUNCTION public.insertrecords_marketfixtures();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_marketfixtures(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."MarketFixtures_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."MarketFixtures" WHERE "MarketFixtures"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer,
+    swish_match_id integer,
+    season character varying(255),
+    date character varying(255),
+    swish_home_team_id integer,
+    swish_away_team_id integer,
+    money_line_json text,
+    totals_json text ,
+    spread_json text ,
+    status integer,
+    "createdAt" timestamp with time zone ,
+    "updatedAt" timestamp with time zone 
+       )
+ );
+ INSERT INTO Public."MarketFixtures" SELECT * FROM public."MarketFixtures_Bak" ;
+ select count(*) into total FROM public."MarketFixtures_Bak";   
+ Drop table public."MarketFixtures_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_marketfixtures()
+    OWNER TO postgres;

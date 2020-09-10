@@ -1,0 +1,39 @@
+-- FUNCTION: public.insertrecords_locationplayers()
+
+-- DROP FUNCTION public.insertrecords_locationplayers();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_locationplayers(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."LocationPlayers_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."LocationPlayers" WHERE "LocationPlayers"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer,
+    location_team_id integer,
+    player_id integer ,
+    status integer,
+    "createdAt" timestamp with time zone ,
+    "updatedAt" timestamp with time zone 
+	      )
+ );
+ INSERT INTO Public."LocationPlayers" SELECT * FROM public."LocationPlayers_Bak" ;
+ select count(*) into total FROM public."LocationPlayers_Bak";   
+ Drop table public."LocationPlayers_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_locationplayers()
+    OWNER TO postgres;

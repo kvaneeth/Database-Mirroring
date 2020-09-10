@@ -1,0 +1,58 @@
+-- FUNCTION: public.insertrecords_users()
+
+-- DROP FUNCTION public.insertrecords_users();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_users(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."Users_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+   'select * from Public."Users" WHERE "Users"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer,
+   login_type character varying(255),
+    social_id character varying(255),
+    device_type character varying(255),
+     device_token character varying(255),
+   "fullName" character varying(255),
+	   email character varying(255),
+	   "userName" character varying(255),
+	  password character varying(255),
+	   mobile character varying(255),
+	   country_code character varying(255),
+	   latitude double precision,
+	  longitude double precision,
+	    address character varying(255),
+	    state_code character varying(255),
+	  city_state_code character varying(255),
+	  activation_key character varying(255),
+	  otp character varying(255),
+	      email_verification integer,
+	   mobile_verification integer,
+	  notifications integer,
+	    img character varying(255),
+	   status integer,
+	   "createdAt" timestamp with time zone,
+	  "updatedAt" timestamp with time zone
+	    )
+ );
+ INSERT INTO Public."Users" SELECT * FROM public."Users_Bak" ;
+ select count(*) into total FROM public."Users_Bak";   
+ Drop table public."Users_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_users()
+    OWNER TO postgres;

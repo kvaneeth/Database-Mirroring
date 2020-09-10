@@ -1,0 +1,75 @@
+-- FUNCTION: public.insertrecords_eventquestions()
+
+-- DROP FUNCTION public.insertrecords_eventquestions();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_eventquestions(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."EventQuestions_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."EventQuestions" WHERE "EventQuestions"."createdAt" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+    id integer ,
+    event_id integer,
+    type integer,
+    category character varying(255),
+    question character varying(255),
+    question_img character varying(255),
+    question_logo_img character varying(255),
+    question_date date,
+    op1 character varying(255),
+    op1_odds double precision,
+    op1_display_odds character varying(255),
+    op1_img character varying(255),
+    op1_logo_img character varying(255),
+    op2 character varying(255),
+    op2_odds double precision,
+    op2_display_odds character varying(255),
+    op2_img character varying(255),
+    op2_logo_img character varying(255),
+    op3 character varying(255),
+    op3_odds double precision,
+    op3_display_odds character varying(255),
+    op3_img character varying(255),
+    op4 character varying(255) ,
+    op4_odds double precision,
+    op4_display_odds character varying(255),
+    op4_img character varying(255),
+    op5 character varying(255),
+    op5_odds double precision,
+    op5_display_odds character varying(255),
+    op5_img character varying(255),
+    op6 character varying(255),
+    op6_odds double precision,
+    op6_display_odds character varying(255),
+    op6_img character varying(255) ,
+    op7 character varying(255) ,
+    op7_odds double precision,
+    op7_display_odds character varying(255) ,
+    op7_img character varying(255) ,
+    answer integer,
+    status integer,
+    "createdAt" timestamp with time zone ,
+    "updatedAt" timestamp with time zone 
+       )
+ );
+ INSERT INTO Public."EventQuestions" SELECT * FROM public."EventQuestions_Bak" ;
+ select count(*) into total FROM public."EventQuestions_Bak";   
+ Drop table public."EventQuestions_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_eventquestions()
+    OWNER TO postgres;

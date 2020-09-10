@@ -1,0 +1,38 @@
+-- FUNCTION: public.insertrecords_games()
+
+-- DROP FUNCTION public.insertrecords_games();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_games(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."games_bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+   'select * from Public."games" WHERE "games"."created_at" BETWEEN NOW() - INTERVAL ''1 weeks'' AND NOW()'
+  ) as t1(
+   id integer ,
+    game_id integer,
+    game_type text ,
+    created_at timestamp with time zone ,
+    updated_at timestamp with time zone  
+	   )
+ );
+ INSERT INTO Public."games" SELECT * FROM public."games_bak" ;
+ select count(*) into total FROM public."games_bak";   
+ Drop table public."games_bak" ;
+ RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_games()
+    OWNER TO postgres;

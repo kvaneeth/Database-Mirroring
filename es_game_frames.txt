@@ -1,0 +1,42 @@
+-- FUNCTION: public.insertrecords_es_game_frames()
+
+-- DROP FUNCTION public.insertrecords_es_game_frames();
+
+CREATE OR REPLACE FUNCTION public.insertrecords_es_game_frames(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+declare
+	total integer;
+BEGIN
+ create table public."es_game_frames_Bak" as(
+ select t1.* 
+ from dblink(
+   'dbname=fanupapp user=postgres password=XawQDSC:xzk276EE',
+  'select * from Public."es_game_frames" WHERE "es_game_frames"."created_at" BETWEEN NOW() - INTERVAL ''7 days'' AND NOW()'
+  ) as t1(
+   id integer,
+    game_id integer,
+    match_id integer,
+    tournament_id integer,
+    blue json,
+    red json,
+    "current_timestamp" integer,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone 
+	  )
+ ) ;
+ INSERT INTO Public."es_game_frames" SELECT * FROM public."es_game_frames_Bak" ;
+ select count(*) into total FROM public."es_game_frames_Bak";   
+ Drop table public."es_game_frames_Bak" ;
+   RETURN total;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insertrecords_es_game_frames()
+    OWNER TO postgres;
