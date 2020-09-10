@@ -1,0 +1,1 @@
+sendmail -f  ubuntu@ip-172-30-1-59.us-east-2.compute.internal -t kvaneeth@gmail.com -s alt3.aspmx.l.google.com -u weekly_insert_log -m report -a /var/tmp/weekly_insert.log
